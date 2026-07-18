@@ -1,5 +1,6 @@
+import { prisma } from '@/lib/prisma';
+
 const PRINTFUL_BASE = 'https://api.printful.com';
-type PrintfulProduct = any;
 
 export async function printfulFetch(path: string, init?: RequestInit) {
   const apiKey = process.env.PRINTFUL_API_KEY;
@@ -12,19 +13,42 @@ export async function printfulFetch(path: string, init?: RequestInit) {
   return res.json();
 }
 
-export async function syncPrintfulProducts() {
-  const { result } = await printfulFetch('/products?limit=100');
-  const list: PrintfulProduct[] = Array.isArray(result) ? result : result.result || [];
-  const synced: PrintfulProduct[] = [];
-  for (const p of list) {
-    synced.push(p);
-    // Upsert base product by printfulId
-    // ...
-  }
-  return { synced };
-}
-
 export async function submitPrintfulOrder(order: { items: any[]; shipping: any; recipient: any; }) {
   const payload = { recipient: order.recipient, items: order.items };
   return printfulFetch('/orders', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+export async function syncPrintfulProducts() {
+  const data = await printfulFetch('/products?limit=100');
+  const list = Array.isArray(data?.result) ? data.result : [];
+
+  let synced = 0;
+  let created = 0;
+  let updated = 0;
+
+  for (const pf of list) {
+    const slug = String(pf.slug || pf.id).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 80);
+    const name = pf.name || `Product ${pf.id}`;
+    const thumb = pf.thumbnail_url || pf.images?.[0] || `https://placehold.co/800x1000/eeeeee/555555?text=${encodeURIComponent(name)}`;
+    const category = (pf.type || 'general').toString();
+    const brand = (pf.brand || 'New Nation').toString();
+
+    const existing = await prisma.product.findUnique({ where: { printfulId: String(pf.id) } }).catch(() => null);
+
+    if (existing) {
+      await prisma.product.update({
+        where: { id: existing.id },
+        data: { name, slug, category, brand, description: existing.description || `${brand} ${category}.`, images: [thumb], tags: [category.toLowerCase(), 'printful'], status: 'active' },
+      });
+      updated += 1;
+    } else {
+      await prisma.product.create({
+        data: { printfulId: String(pf.id), slug: `${slug}-${pf.id}`, name, category, brand, price: 0, description: `${brand} ${category}.`, images: [thumb], tags: [category.toLowerCase(), 'printful'], status: 'active', featured: false, rating: 0, reviewCount: 0 },
+      });
+      created += 1;
+    }
+    synced += 1;
+  }
+
+  return { synced, created, updated };
 }
