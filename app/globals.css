@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f7f6f2;
+  --bg-2: #eceae6;
+  --ink: #0c0c0c;
+  --ink-2: #1a1a1a;
+  --ink-3: #5c5b58;
+  --ink-4: #8f8d88;
+  --border: rgba(12,12,12,0.06);
+  --accent: #ff6b35;
+  --accent-2: #e85a28;
+  --accent-soft: rgba(255,107,53,0.12);
+  --font-body: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+}
+
+.dark {
+  --bg: #0c0c0c;
+  --bg-2: #141414;
+  --ink: #f7f6f2;
+  --ink-2: #e0ded8;
+  --ink-3: #a8a49d;
+  --ink-4: #706c65;
+  --border: rgba(255,255,255,0.08);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* Loading / skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-2) 25%, var(--border) 50%, var(--bg-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 12px;
+}
