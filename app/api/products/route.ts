@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { PRODUCTS, VARIANTS } from '@/data/products';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -7,27 +7,18 @@ export async function GET(request: NextRequest) {
   const search = url.searchParams.get('search') || undefined;
   const featured = url.searchParams.get('featured');
 
-  const where: any = { status: 'active' };
-  if (category) where.category = category;
-  if (featured) where.featured = true;
+  let products = PRODUCTS.filter(p => p.status === 'active');
+  if (category) products = products.filter(p => p.category === category);
+  if (featured) products = products.filter(p => p.featured);
   if (search) {
-    where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { tags: { has: search.toLowerCase() } },
-    ];
+    const q = search.toLowerCase();
+    products = products.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags.some(t => t.includes(q)));
   }
 
-  try {
-    const products = await prisma.product.findMany({
-      where,
-      include: { variants: { where: { available: true }, orderBy: { sortOrder: 'asc' } } },
-      orderBy: { featured: 'desc' },
-      take: 200,
-    });
-    return NextResponse.json({ products });
-  } catch (e) {
-    console.error('Products API failed', e);
-    return NextResponse.json({ products: [], error: 'db_unavailable' });
-  }
+  const withVariants = products.map(p => ({
+    ...p,
+    variants: VARIANTS[p.id] || [],
+  }));
+
+  return NextResponse.json({ products: withVariants });
 }
