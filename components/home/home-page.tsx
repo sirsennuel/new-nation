@@ -31,7 +31,7 @@ export default function HomePage() {
       {/* Hero */}
       <div className="relative min-h-screen flex items-center">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&auto=format&fit=crop" alt="" className="w-full h-full object-cover opacity-70" />
+          <Image src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1600&auto=format&fit=crop" alt="" fill priority className="object-cover opacity-70" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
         </div>
         <motion.div className="relative z-10 max-w-7xl mx-auto px-6 pt-28 pb-20 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
@@ -92,8 +92,8 @@ export default function HomePage() {
               <div className="border border-white/10 rounded-2xl p-6"><div className="text-3xl font-display font-semibold">200+</div><div className="text-white/60 text-sm mt-1">Countries shipped</div></div>
             </div>
           </div>
-          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-white/5">
-            <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=900&auto=format&fit=crop" alt="Lifestyle" className="w-full h-full object-cover opacity-80" />
+          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-white/5 relative">
+            <Image src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=900&auto=format&fit=crop" alt="Lifestyle" fill className="object-cover opacity-80" />
           </div>
         </div>
       </section>

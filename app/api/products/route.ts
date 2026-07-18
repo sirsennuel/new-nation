@@ -18,12 +18,16 @@ export async function GET(request: NextRequest) {
     ];
   }
 
-  const products = await prisma.product.findMany({
-    where,
-    include: { variants: { where: { available: true }, orderBy: { sortOrder: 'asc' } } },
-    orderBy: { featured: 'desc' },
-    take: 200,
-  });
-
-  return NextResponse.json({ products });
+  try {
+    const products = await prisma.product.findMany({
+      where,
+      include: { variants: { where: { available: true }, orderBy: { sortOrder: 'asc' } } },
+      orderBy: { featured: 'desc' },
+      take: 200,
+    });
+    return NextResponse.json({ products });
+  } catch (e) {
+    console.error('Products API failed', e);
+    return NextResponse.json({ products: [], error: 'db_unavailable' });
+  }
 }
