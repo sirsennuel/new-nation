@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { fallbackImage } from '@/lib/utils';
 import type { ProductModel } from '@/types';
+import ProductCard from '@/components/products/ProductCard';
 
 const HIGHLIGHTS: { title: string; body: string }[] = [
   { title: 'Printful connected', body: 'Every order ships automatically.' },
@@ -66,16 +67,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featured.slice(0, 8).map(p => (
-            <Link key={p.id} href={`/product/${p.slug}`} className="group">
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 relative">
-                <Image src={p.images?.[0] || fallbackImage(p.name)} alt={p.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-              </div>
-              <div className="mt-4">
-                <div className="text-xs text-ink-4 uppercase tracking-widest">{p.category}</div>
-                <div className="font-semibold mt-1">{p.name}</div>
-                <div className="mt-1 text-accent font-semibold">${(p.price / 100).toFixed(2)}</div>
-              </div>
-            </Link>
+            <ProductCard key={p.id} p={{ id: p.id, slug: p.slug, name: p.name, category: p.category, price: p.price, image: p.images?.[0] || fallbackImage(p.name) }} />
           ))}
         </div>
       </section>

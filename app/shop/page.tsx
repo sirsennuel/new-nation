@@ -1,8 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import ProductGrid from '@/components/products/ProductGrid';
 import { useCartStore, useWishlistStore } from '@/store';
 import { fallbackImage } from '@/lib/utils';
 import type { ProductModel } from '@/types';
@@ -54,27 +52,7 @@ export default function ShopPage() {
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search" className="input w-64" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map(p => {
-              const isWish = wishlist.some(w => w.id === p.id);
-              return (
-                <motion.div key={p.id} layout className="group border border-border rounded-2xl overflow-hidden hover:shadow-soft transition-all">
-                  <Link href={`/product/${p.slug}`} className="relative block aspect-[3/4] bg-bg2 overflow-hidden">
-                    <Image src={p.images?.[0] || fallbackImage(p.name)} alt={p.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                  </Link>
-                  <div className="p-5">
-                    <div className="text-xs text-ink-4 uppercase tracking-widest">{p.category}</div>
-                    <Link href={`/product/${p.slug}`}><div className="font-semibold mt-1 group-hover:text-accent transition-colors">{p.name}</div></Link>
-                    <div className="mt-1 text-accent font-semibold">${(p.price / 100).toFixed(2)}</div>
-                    <div className="flex gap-2 mt-4">
-                      <button onClick={() => addItem({ productId: p.id })} className="btn btn-primary flex-1 justify-center text-sm py-2">Add to Cart</button>
-                      <button onClick={() => useWishlistStore.getState().toggle(p)} className={cn('p-2 rounded-full border border-border hover:bg-accent hover:text-white transition', isWish && 'bg-accent text-white')}>♡</button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
+          <ProductGrid products={products} />
           {!products.length && <div className="text-center text-ink-4 py-20">No products found.</div>}
         </div>
       </div>
